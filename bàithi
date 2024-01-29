@@ -1,0 +1,353 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ontapthi2
+{
+    internal class Program
+    {
+        static void menu()
+        {
+            Console.OutputEncoding = Encoding.UTF8;
+            Console.WriteLine("----------------------------Chương trình quản lý nhân viên--------------------------------------");
+            Console.WriteLine("------------------------------------------------------------------------------------------------");
+            Console.WriteLine("1. Nhập danh sách nhân viên---------------------------------------------------------------------");
+            Console.WriteLine("2. Xuất danh sách nhân viên vừa nhập------------------------------------------------------------");
+            Console.WriteLine("3. sắp xếp danh sách nhân viên theo tổng lương giảm dần-----------------------------------------");
+            Console.WriteLine("3. Thực hiện việc tính lương và in ra danh sách lương-------------------------------------------");
+            Console.WriteLine("4. Tính tổng tiền lương, tổng lương thêm và tổng chi tiền lương mà công ty chi trả lương 1 tháng");
+            Console.WriteLine("5. Kết thúc chương trình------------------------------------------------------------------------");
+            Console.WriteLine("----------------------------------------------Hết-----------------------------------------------");
+            Console.Write("Mời bạn chọn thao tác: ");
+        }
+        static int luachon()
+        {
+            menu();
+            int LC = int.Parse(Console.ReadLine());
+            return LC;
+        }
+        static int LC, soluongnhanvien;
+        public static NhanVien[] nnvv;
+        public static int c;
+        static NhanVien[] nhapnhieunhanvien()
+        {
+            Console.Write("Nhập số lượng nhân viên: ");
+            soluongnhanvien = int.Parse(Console.ReadLine());
+            nnvv = new NhanVien[soluongnhanvien];
+            for (int i = 0; i < soluongnhanvien; i++)
+            {
+                Console.WriteLine($"Nhập thông tin cho nhân viên thứ {i + 1}:");
+                Console.Write($"Nhân viên {i + 1} có chức vụ (1 - NV bán hàng, 2 - NV sản xuất, 3 - NV khác): ");
+                c = int.Parse(Console.ReadLine());
+                if (c == 1)
+                {
+                    nnvv[i] = new NVbanhang();
+                }
+                else if (c == 2)
+                {
+                    nnvv[i] = new NVsanxuat();
+                }
+                else
+                    nnvv[i] = new NVkhac();
+                nnvv[i].Nhap();
+            }
+            return nnvv;
+        }
+        static NhanVien NhapNhanVien()
+        {
+            int loaiNhanVien;
+
+            Console.Write("Chọn loại nhân viên (1 - NV bán hàng, 2 - NV sản xuất, 3 - NV khác):");
+            loaiNhanVien = int.Parse(Console.ReadLine());
+
+            NhanVien nhanVien;
+
+            switch (loaiNhanVien)
+            {
+                case 1:
+                    nhanVien = new NVbanhang();
+                    break;
+                case 2:
+                    nhanVien = new NVsanxuat();
+                    break;
+                case 3:
+                    nhanVien = new NVkhac();
+                    break;
+                default:
+                    throw new ArgumentException("Loại nhân viên không hợp lệ");
+            }
+
+            nhanVien.Nhap();
+
+            return nhanVien;
+        }
+        static NhanVien[] sapxep()
+        {
+            for (int i = 0; i < soluongnhanvien; i++)
+            {
+                for (int j = i + 1; j < soluongnhanvien; j++)
+                {
+                    if (nnvv[i].tongluong() < nnvv[j].tongluong())
+                    {
+                        NhanVien temp = nnvv[i];
+                        nnvv[i] = nnvv[j];
+                        nnvv[j] = temp;
+                    }
+                }
+            }
+            return nnvv;
+        }
+        static void tongcong()
+        {
+            double tongluongthang = 0;
+            double tongluongthem = 0;
+            double tongtongluong = 0;
+            //NhanVien[] tong = new NhanVien[3];
+            for (int i = 0; i < soluongnhanvien; i++)
+            {
+                tongluongthang += NhanVien.luongthang(NhanVien.luongcoban, NhanVien.snlv);
+                tongluongthem += nnvv[i].luongthem();
+                tongtongluong += nnvv[i].tongluong();
+            }
+            Console.WriteLine($"{null,51}|{tongluongthang,10}|{tongluongthem,10}|{tongtongluong,10}|");
+        }
+        public static bool kiemtrathuoctinhkhoa(NhanVien[] nnvv)
+        {
+            for (int i = 0; i < nnvv.Length; i++)
+            {
+                for (int j = i + 1; j < nnvv.Length; j++)
+                {
+                    if (nnvv[i] != null && nnvv[j] != null && nnvv[i].MNV == nnvv[j].MNV)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        static void Main(string[] args)
+        {
+            do
+            {
+                LC = luachon();
+                switch (LC)
+                {
+                    case 1:
+                        int chon;
+                        Console.Write("Bạn muốn nhập 1 nhân viên (1) hay nhiều nhân viên (2): ");
+                        chon = int.Parse(Console.ReadLine());
+                        if (chon == 1)
+                        {
+                            NhapNhanVien();
+                        }
+                        else
+                            nhapnhieunhanvien();
+                        break;
+                    case 2:
+                        Console.WriteLine("Danh sách bạn vừa nhập là: ");
+                        Console.WriteLine($"|{"maNV",10}|{"HoTen",10}|{"ngSinh",10}|{"vtcv",17}|{"luongthang",10}|{"luongthêm",10}|{"tongluong",10}|");
+                        for (int i = 0; i < soluongnhanvien; i++)
+                        {
+                            nnvv[i].xuaat();
+                            Console.WriteLine();
+                        }
+                        Console.WriteLine();
+                        break;
+                    case 3:
+                        Console.WriteLine("danh sách sau khi đã sắp xếp là: ");
+                        sapxep();
+                        Console.WriteLine($"|{"maNV",10}|{"HoTen",10}|{"ngSinh",10}|{"vtcv",17}|{"luongthang",10}|{"luongthêm",10}|{"tongluong",10}|");
+                        for (int i = 0; i < soluongnhanvien; i++)
+                        {
+                            nnvv[i].xuaat();
+                            Console.WriteLine();
+                        }
+                        Console.WriteLine();
+                        break;
+                    case 4:
+                        Console.WriteLine($"|{"maNV",10}|{"HoTen",10}|{"ngSinh",10}|{"vtcv",17}|{"luongthang",10}|{"luongthêm",10}|{"tongluong",10}|");
+                        for (int i = 0; i < soluongnhanvien; i++)
+                        {
+                            nnvv[i].xuaat();
+                            Console.WriteLine();
+                        }
+                        tongcong();
+                        break;
+                }
+            } while (LC != 0);
+            Console.ReadKey();
+        }
+    }
+    abstract class NhanVien
+    {
+        public string MNV;
+        protected string HoTen;
+        protected string GT;
+        protected NgaySinh ngsinh;
+        protected string vtcv;
+        public static int luongcoban;
+        public static int snlv;
+        public virtual void Nhap()
+        {
+            Console.Write("Nhập mã nhân viên: ");
+            MNV = Console.ReadLine();
+            while (Program.kiemtrathuoctinhkhoa(Program.nnvv) == true)
+            {
+                Console.WriteLine("Bạn nhập MNV bị trùng. Mời bạn nhập lại!");
+                Console.Write("Nhập mã nhân viên: ");
+                MNV = Console.ReadLine();
+            }
+            Console.Write("Nhập họ tên nhân viên: ");
+            HoTen = Console.ReadLine();
+            Console.Write("Nhập giới tính: ");
+            GT = Console.ReadLine();
+            ngsinh = new NgaySinh();
+            ngsinh = NgaySinh.nhapns();
+            if (Program.c == 1)
+            {
+                vtcv = "NV bán hàng ";
+            }
+            else if (Program.c == 2)
+            {
+                vtcv = "NV sản xuất ";
+            }
+            else
+            { vtcv = "NV khác"; }
+            Console.WriteLine("Nhập vị trí công việc: {0}", vtcv);
+            Console.Write("Nhập lương: ");
+            luongcoban = int.Parse(Console.ReadLine());
+            Console.Write("Nhập số ngày làm việc: ");
+            snlv = int.Parse(Console.ReadLine());
+        }
+        public static double luongthang(int luongcoban, int snlv)
+        {
+            return (luongcoban / 26) * snlv;
+        }
+        public virtual void xuaat()
+        {
+            Console.Write("|{0,10}|{1,10}|{2,10}", MNV, HoTen, ngsinh.ngay + "/" + ngsinh.thang + "/" + ngsinh.nam);
+            Console.Write($"|{vtcv,17}|{luongthang(luongcoban, snlv),10}|");
+        }
+        public abstract double luongthem();
+        public abstract double tongluong();
+    }
+    class NgaySinh
+    {
+        public int ngay;
+        public int thang;
+        public int nam;
+        public NgaySinh()
+        {
+            ngay = 1; thang = 1; nam = 1;
+        }
+        public NgaySinh(int ngay, int thang, int nam)
+        {
+            this.ngay = ngay; this.thang = thang; this.nam = nam;
+        }
+        public static NgaySinh nhapns()
+        {
+            NgaySinh ngaysinh = new NgaySinh();
+            Console.Write("Nhập ngày(dd): ");
+            ngaysinh.ngay = int.Parse(Console.ReadLine());
+            Console.Write("Nhập tháng(mm): ");
+            ngaysinh.thang = int.Parse(Console.ReadLine());
+            Console.Write("Nhập năm(yyyy): ");
+            ngaysinh.nam = int.Parse(Console.ReadLine());
+            return ngaysinh;
+        }
+    }
+    class NVbanhang : NhanVien
+    {
+        public int spbanduoc = 0;
+        private int spbantieuchuan = 10;
+        public override void Nhap()
+        {
+            base.Nhap();
+            Console.Write("Nhập số sản phẩm bán được(sp/tháng): ");
+            spbanduoc = int.Parse(Console.ReadLine());
+        }
+        public override double luongthem()
+        {
+            if (spbanduoc > spbantieuchuan)
+            {
+                return 200000 * (spbanduoc - spbantieuchuan);
+            }
+            else
+                return 0;
+        }
+        public override void xuaat()
+        {
+            double tong = tongluong();
+            base.xuaat();
+            Console.Write("{0,10}|{1,10}|", luongthem(), tong);
+        }
+        public override double tongluong()
+        {
+            double b = luongthang(luongcoban, snlv);
+            double c = luongthem();
+            return b + c;
+        }
+    }
+    class NVsanxuat : NhanVien
+    {
+        public int spsanxuatduoc = 0;
+        public double sptieuchuan = 5;
+        public override void Nhap()
+        {
+            base.Nhap();
+            Console.Write("Nhập số sản phẩm sản xuất được(sp/tháng): ");
+            spsanxuatduoc = int.Parse(Console.ReadLine());
+        }
+        public override void xuaat()
+        {
+            double tong = tongluong();
+            base.xuaat();
+            Console.Write("{0,10}|{1,10}|", luongthem(), tong);
+        }
+        public override double luongthem()
+        {
+            if (spsanxuatduoc > sptieuchuan)
+            {
+                return 100000 * (spsanxuatduoc - sptieuchuan);
+            }
+            else { return 0; }
+        }
+        public override double tongluong()
+        {
+            return luongthang(luongcoban, snlv) + luongthem();
+        }
+    }
+    class NVkhac : NhanVien
+    {
+        public int sogiolamviec = 0;
+        public int sogiotieuchuan = 40;
+        public override void Nhap()
+        {
+            base.Nhap();
+            Console.Write("Nhập số giờ làm việc(giờ/tuần): ");
+            sogiolamviec = int.Parse(Console.ReadLine());
+        }
+        public override void xuaat()
+        {
+            double tong = tongluong();
+            base.xuaat();
+            Console.Write("{0,10}|{1,10}|", luongthem(), tong);
+        }
+        public override double luongthem()
+        {
+            if (sogiolamviec > sogiotieuchuan)
+            {
+                return 50000 * (sogiolamviec - sogiotieuchuan);
+            }
+            else { return 0; }
+        }
+        public override double tongluong()
+        {
+            return luongthang(luongcoban, snlv) + luongthem();
+        }
+    }
+}
